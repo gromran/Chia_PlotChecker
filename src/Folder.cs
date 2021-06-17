@@ -9,9 +9,10 @@ using System.Threading.Tasks;
 
 namespace PlotChecker.src
 {
+    [Serializable]
     public class Folder
     {
-        public HashSet<Plot> plotList = new HashSet<Plot>();
+        public Dictionary<string, Plot> plotList = new Dictionary<string, Plot>();
 
         public string folderName;
         public string fullPath;
@@ -31,30 +32,9 @@ namespace PlotChecker.src
 
             foreach (FileInfo item in new DirectoryInfo(this.fullPath).GetFiles("*.plot"))
             {
-                this.plotList.Add(new Plot(new FileInfo(item.FullName)));
+                this.plotList.Add(Tools.GetMD5HashFromString(item.Name), new Plot(new FileInfo(item.FullName)));
             }
 
-        }
-
-        public string SerializeToJSON()
-        {
-            Dictionary<string,string> res = new Dictionary<string, string>();
-            res.Add("folderName", this.folderName);
-            res.Add("fullPath", this.fullPath);
-
-            List<string> plots = new List<string>();
-
-            foreach (var item in plotList)
-            {
-                plots.Add(item.SerializeToJSON());
-            }
-
-            res.Add("plots", JsonSerializer.Serialize(plots));
-
-
-
-            var s = JsonSerializer.Serialize(res);
-            return s;
         }
 
     }

@@ -10,32 +10,21 @@ using System.Threading.Tasks;
 
 namespace PlotChecker.src
 {
+    [Serializable]
     public class Plot {
 
         public string Folder;
         public string FileName;
 
         //n, proofs
-        public Dictionary<int, string> checkResult = new Dictionary<int, string>();
+        public Dictionary<int, int> checkResult = new Dictionary<int, int>();
 
         public Plot(FileInfo file) {
             this.Folder = file.DirectoryName;
             this.FileName = file.Name;
         }
+        public Plot() { }
 
-        public string SerializeToJSON() {
-
-            NameValueCollection res = new NameValueCollection();
-
-            res.Add("Folder", this.Folder);
-            res.Add("FileName", this.FileName);
-
-            //NameValueCollection res = new NameValueCollection();
-
-            var s = JsonSerializer.Serialize(res);
-
-            return s;
-        }
     }
 
 }
