@@ -17,7 +17,7 @@ namespace PlotChecker.src
         public string FileName;
 
         //n, proofs
-        public Dictionary<int, int> checkResult = new Dictionary<int, int>();
+        public SortedDictionary<int, int> checkResult = new SortedDictionary<int, int>();
 
         public Plot(FileInfo file) {
             this.Folder = file.DirectoryName;

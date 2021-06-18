@@ -17,11 +17,27 @@ namespace PlotChecker
     public partial class Form1 : Form
     {
 
-        public Dictionary<string, Folder> folderList = new Dictionary<string, Folder>();
+        private Dictionary<string, Folder> folderList = new Dictionary<string, Folder>();
+
+        private BackgroundWorker backgroundWorker1 = new BackgroundWorker();
 
         public Form1()
         {
             InitializeComponent();
+            this.backgroundWorker1.WorkerReportsProgress = true;
+            this.backgroundWorker1.DoWork += new DoWorkEventHandler(this.backgroundWorker1_DoWork);
+            this.backgroundWorker1.ProgressChanged += new ProgressChangedEventHandler(this.backgroundWorker1_ProgessChanged);
+            this.backgroundWorker1.RunWorkerCompleted += new RunWorkerCompletedEventHandler(this.backgroundWorker1_Completed);
+
+        }
+
+        private void backgroundWorker1_ProgessChanged(object sender, ProgressChangedEventArgs e) {
+            progressBar1.PerformStep();
+        }
+        private void backgroundWorker1_Completed(object sender, RunWorkerCompletedEventArgs e) {
+            this.FillPlotList();
+            progressBar1.Visible = false;
+            btnCheckPlots.Enabled = true;
         }
 
         private void btnAddFolder_Click(object sender, EventArgs e)
@@ -52,13 +68,22 @@ namespace PlotChecker
 
         private void BtnCheckPlots_Click(object sender, EventArgs e)
         {
-            foreach (var item in folderList)
-            {
-                //await Checker.CheckPlotsAsync(item.Value.plotList);
-                item.Value.plotList = Checker.CheckPlots(item.Value.plotList, (int)numericUpDown_nValue.Value);
-
+            /*
+            int count = 0;
+            foreach (var item in folderList) {
+                count += item.Value.plotList.Count;
             }
-            FillPlotList();
+            progressBar1.Maximum = count;
+            */
+            progressBar1.Maximum = folderList.Count;
+            progressBar1.Visible = true;
+            ((Button)sender).Enabled = false;
+
+            List<Object> args = new List<object>();
+            args.Add(folderList);
+            args.Add((int)numericUpDown_nValue.Value);
+            backgroundWorker1.RunWorkerAsync(args);
+            //FillPlotList();
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -82,6 +107,7 @@ namespace PlotChecker
             foreach (var item in folderList)
             {
                 var firstItem = true;
+
                 foreach (Plot p in item.Value.plotList.Values)
                 {
                     if (firstItem == true)
@@ -89,7 +115,6 @@ namespace PlotChecker
                         firstItem = false;
                         listView_Plots.Columns.Clear();
 
-                        int i = 2;
                         List<ColumnHeader> ch = new List<ColumnHeader>();
 
 
@@ -148,6 +173,23 @@ namespace PlotChecker
         private void ClBFolders_SelectedIndexChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
+        {
+            List<Object> args = (List<Object>)e.Argument;
+
+            BackgroundWorker helperBW = sender as BackgroundWorker;
+
+            foreach (var item in (Dictionary<string, Folder>)args[0])
+            {
+                item.Value.plotList = Checker.CheckPlots(item.Value.plotList, (int)args[1]);
+                helperBW.ReportProgress(1);
+                if (helperBW.CancellationPending)
+                {
+                    e.Cancel = true;
+                }
+            }
         }
     }
 }

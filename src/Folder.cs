@@ -32,7 +32,11 @@ namespace PlotChecker.src
 
             foreach (FileInfo item in new DirectoryInfo(this.fullPath).GetFiles("*.plot"))
             {
-                this.plotList.Add(Tools.GetMD5HashFromString(item.Name), new Plot(new FileInfo(item.FullName)));
+                string hash = Tools.GetMD5HashFromString(item.Name);
+                if (!this.plotList.ContainsKey(hash))
+                {
+                    this.plotList.Add(hash, new Plot(new FileInfo(item.FullName)));
+                }
             }
 
         }

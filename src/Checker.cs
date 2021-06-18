@@ -13,14 +13,9 @@ namespace PlotChecker.src
 {
     class Checker
     {
-        //public Dictionary<string, Task> taskList = new Dictionary<string, Task>(5);
 
-        public static async Task CheckPlotsAsync(Dictionary<string, Plot> pList) {
-            foreach (var item in pList)
-            {
-                Console.WriteLine(item.Value.FileName);
-                MessageBox.Show(item.Value.Folder);
-            }
+        public static Plot CheckPlot(Plot plot) {
+            return null;
         }
 
         public static Dictionary<string, Plot> CheckPlots(Dictionary<string, Plot> pList, int n = 30)
@@ -35,7 +30,7 @@ namespace PlotChecker.src
                 processStartInfo.RedirectStandardInput = true;
                 processStartInfo.UseShellExecute = false;
                 processStartInfo.Arguments = "plots check -n "+n.ToString()+" -g " + item.Value.FileName;
-                processStartInfo.FileName = @"C:\Users\Gromran\AppData\Local\chia-blockchain\app-1.1.7\resources\app.asar.unpacked\daemon\chia.exe";
+                processStartInfo.FileName = @"%userprofile%\AppData\Local\chia-blockchain\app-1.1.7\resources\app.asar.unpacked\daemon\chia.exe";
 
                 var process = Process.Start(processStartInfo);
                 var output = process.StandardError.ReadToEnd();
